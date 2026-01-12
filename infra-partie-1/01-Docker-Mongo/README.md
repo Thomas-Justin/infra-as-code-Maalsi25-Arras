@@ -7,8 +7,8 @@ Dans ce TP, j’ai intégré MongoDB dans un conteneur Docker et j’ai appris �
 J’ai créé un fichier docker-compose.yml pour définir le conteneur MongoDB.
 Voici le contenu utilisé :
 
-```version: "3.1"
-
+```
+version: "3.1"
 services:
   mongo:
     image: mongo
