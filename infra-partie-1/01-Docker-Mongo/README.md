@@ -1,4 +1,4 @@
-# TP – MongoDB avec Docker
+# Atelier 1 – MongoDB avec Docker
 
 Dans ce TP, j’ai intégré MongoDB dans un conteneur Docker et j’ai appris à interagir avec lui.
 
@@ -37,7 +37,6 @@ Je me suis connecté au conteneur avec mongosh :
 
 docker exec -it nosql-database mongosh -u admin -p password
 
-
 Dans le shell MongoDB, j’ai créé une base et une collection, puis j’ai inséré un document :
 
 ```
@@ -61,6 +60,7 @@ Le port a été choisi pour éviter les conflits avec d’autres services.
 ## 4. Arrêt et suppression du conteneur
 
 Pour nettoyer l’environnement, j’ai arrêté et supprimé le conteneur ainsi que ses volumes :
+
 ```
 docker stop nosql-database
 docker rm -v nosql-database
