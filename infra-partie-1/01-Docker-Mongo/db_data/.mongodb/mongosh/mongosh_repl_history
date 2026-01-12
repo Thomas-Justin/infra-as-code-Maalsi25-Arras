@@ -1,0 +1,4 @@
+db.users.insertOne({ name: "Alice", age: 25 })
+use testdb
+db.users.insertOne({ name: "Alice", age: 25 })
+use testdb
