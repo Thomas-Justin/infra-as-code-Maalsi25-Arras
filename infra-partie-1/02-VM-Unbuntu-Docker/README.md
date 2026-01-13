@@ -2,32 +2,36 @@
 
 ## Objectif
 
-Dans cet atelier, j'ai configuré ma propre machine virtuelle et déployé un conteneur Docker exécutant une application web. L'objectif était de mettre en pratique la théorie sur les machines virtuelles, Docker et la configuration réseau.
+Cet atelier consiste à configurer une machine virtuelle et à déployer un conteneur Docker exécutant une application web. L'objectif est de mettre en pratique les concepts de virtualisation, de conteneurs et de configuration réseau.
 
 ## Étapes réalisées
 
 ### 1. Mise en place de la VM
 
-- J'ai installé VirtualBox sur ma machine hôte.
-- J'ai créé une VM nommée `UbuntuDev` avec Ubuntu Server 64-bit.
-- J'ai attribué 2 Go de RAM et 20 Go de stockage en VDI dynamique.
-- J'ai installé Ubuntu à partir de l'image ISO téléchargée. Étant sur un Mac avec puce Apple Silicon, j'ai dû choisir une image ARM 64.
-- J'ai configuré le réseau en mode Pont pour que ma VM soit visible sur le réseau local.
-- J'ai installé et activé le serveur SSH pour me connecter à la VM depuis mon hôte.
+- VirtualBox a été installé sur la machine hôte.
+- Une VM nommée `UbuntuDev` a été créée avec Ubuntu Server 64-bit.
+- La VM a été configurée avec 2 Go de RAM et 20 Go de stockage en VDI dynamique.
+- Ubuntu a été installé à partir d'une image ISO. Sur un Mac équipé d'une puce Apple Silicon, une image ARM 64 a été utilisée.
+- Le réseau a été configuré en mode Pont afin que la VM soit visible sur le réseau local.
+- Le serveur SSH a été installé et activé pour permettre les connexions depuis la machine hôte.
 
 ### 2. Installation et configuration de Docker
 
-- J'ai installé Docker sur ma VM en suivant les instructions officielles pour Ubuntu.
-- J'ai téléchargé l'image Nginx depuis le registre Docker.
-- J'ai lancé un conteneur Nginx en arrière-plan avec le port 80 de la VM exposé.
-- J'ai vérifié que le conteneur était opérationnel via `docker ps` et `curl localhost`.
+- Docker a été installé sur la VM selon les instructions officielles pour Ubuntu.
+- L'image Nginx a été téléchargée depuis le registre Docker.
+- Un conteneur Nginx a été lancé en arrière-plan avec le port 80 de la VM exposé.
+- La disponibilité du conteneur a été vérifiée via `docker ps` et `curl localhost`.
 
 ### 3. Accès à l'application web
 
-- Depuis mon navigateur sur la machine hôte, j'ai configuré le port forwarding ou utilisé l'adresse IP de la VM pour accéder à Nginx.
-- La page d'accueil par défaut de Nginx s'affiche correctement, ce qui confirme que le conteneur fonctionne.
+- Le port 80 du conteneur a été rendu accessible depuis la machine hôte en configurant deux règles réseau :
+
+  1. **Port forwarding (NAT)** : pour permettre à la machine hôte d’accéder au conteneur. Le port 8080 de l’hôte a été redirigé vers le port 80 de la VM dans VirtualBox. L'application est accessible via `http://127.0.0.1:8080`.
+  2. **Réseau en Pont** : la VM reçoit une adresse IP sur le réseau local, permettant un accès direct depuis d'autres appareils du réseau. L'adresse IP statique a été configurée via Netplan dans `/etc/netplan/50-cloud-init.yaml` et appliquée avec `sudo netplan apply`.
+
+- La page d'accueil par défaut de Nginx s'affiche correctement, confirmant que le conteneur fonctionne.
 
 ### 4. Configuration réseau avancée
 
-- J'ai exploré les différents types de réseau dans VirtualBox : NAT, Pont et Interne.
-- J'ai testé la configuration d'une adresse IP statique via Netplan pour la VM.
+- Différents types de réseau VirtualBox ont été explorés : NAT, Pont et Interne.
+- La configuration d'une adresse IP statique a été testée pour la VM afin de simplifier l'accès aux services déployés.
