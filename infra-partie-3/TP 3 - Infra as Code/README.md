@@ -1,8 +1,6 @@
-📘 TP – Infrastructure as Code
+# TP – Infrastructure as Code
 
-WebSolutions Inc.
-
-📌 Contexte
+## Contexte
 
 WebSolutions Inc. est une entreprise spécialisée dans le développement d’applications web.
 Elle gère plusieurs applications internes nécessitant des environnements fiables, reproductibles et sécurisés.
@@ -17,7 +15,7 @@ des déploiements longs et difficiles à maintenir
 
 Afin d’améliorer ce processus, l’entreprise souhaite mettre en place une approche Infrastructure as Code (IaC).
 
-🎯 Objectifs du TP
+## Objectifs du TP
 
 Ce TP a pour objectif de :
 
@@ -29,8 +27,9 @@ faciliter le déploiement des applications web
 
 introduire des pratiques DevOps modernes
 
-🛠️ Technologies utilisées
-Terraform / OpenTofu
+## Technologies utilisées
+
+### Terraform / OpenTofu
 
 Rôle : Provisionnement de l’infrastructure
 
@@ -56,7 +55,7 @@ déploiement rapide
 
 cohérence entre les environnements
 
-Ansible
+### Ansible
 
 Rôle : Configuration des serveurs
 
@@ -82,7 +81,7 @@ basé sur SSH
 
 très adapté à l’automatisation
 
-CI/CD (Pipeline de déploiement)
+### CI/CD (Pipeline de déploiement)
 
 Rôle : Déploiement continu
 
@@ -108,28 +107,29 @@ amélioration de la qualité du code
 
 gain de temps pour les équipes
 
-🗂️ Arborescence du projet
-iac-websolutions/
-│
-├── terraform/
-│ ├── main.tf # Définition de l’infrastructure
-│ ├── variables.tf # Variables Terraform
-│ ├── outputs.tf # Informations de sortie
-│
-├── ansible/
-│ ├── playbook.yml # Playbook principal
-│ ├── inventory.ini # Inventaire des serveurs
-│ └── roles/
-│ ├── web/
-│ ├── app/
-│ └── db/
-│
-├── ci-cd/
-│ └── pipeline.yml # Exemple de pipeline CI/CD
-│
-└── README.md
+## Arborescence du projet
 
-🔄 Fonctionnement global
+`websolutions/
+  │
+  ├── terraform/
+  │ ├── main.tf
+  │ ├── variables.tf
+  │ ├── outputs.tf
+  │
+  ├── ansible/
+  │ ├── playbook.yml
+  │ ├── inventory.ini
+  │ └── roles/
+  │ ├── web/
+  │ ├── app/
+  │ └── db/
+  │
+  ├── ci-cd/
+  │ └── pipeline.yml
+  │
+  └── README.md`
+
+## Fonctionnement global
 
 Terraform est exécuté pour créer l’infrastructure (VM, réseau, sécurité).
 
@@ -139,17 +139,15 @@ Le pipeline CI/CD déploie l’application après validation du code.
 
 Les environnements sont cohérents et reproductibles.
 
-⚠️ Difficultés rencontrées
+## Difficultés rencontrées
 
-Prise en main des outils IaC
+Prise en main des outils
 
 Gestion de l’ordre d’exécution entre Terraform et Ansible
 
 Séparation claire entre provisionnement et configuration
 
-Sécurisation des accès et des mots de passe
-
-🚀 Améliorations possibles
+## Améliorations possibles
 
 Gestion sécurisée des secrets (Vault, variables chiffrées)
 
@@ -159,11 +157,11 @@ Orchestration avec Kubernetes
 
 Ajout de monitoring (Prometheus, Grafana)
 
-Mise en place de déploiements Blue/Green
+Ajout d’un environnement de pré-production / production ( ansible + docker)
 
-Ajout d’un environnement de production
+Meilleures performances avec Redis
 
-✅ Conclusion
+## Conclusion
 
 L’utilisation de l’Infrastructure as Code permet de fiabiliser le déploiement des applications web tout en réduisant les erreurs humaines.
 Cette approche améliore la maintenabilité, la sécurité et la rapidité de mise en production, tout en s’inscrivant dans une démarche DevOps moderne.
