@@ -19,13 +19,10 @@ Afin d’améliorer ce processus, l’entreprise souhaite mettre en place une ap
 
 Ce TP a pour objectif de :
 
-automatiser la création de l’infrastructure
-
-garantir la cohérence des environnements
-
-faciliter le déploiement des applications web
-
-introduire des pratiques DevOps modernes
+- Automatiser la création de l’infrastructure
+- Garantir la cohérence des environnements
+- Faciliter le déploiement des applications web
+- Introduire des pratiques DevOps modernes
 
 ## Technologies utilisées
 
@@ -109,7 +106,8 @@ gain de temps pour les équipes
 
 ## Arborescence du projet
 
-`websolutions/
+```bash
+websolutions/
   │
   ├── terraform/
   │ ├── main.tf
@@ -128,6 +126,7 @@ gain de temps pour les équipes
   │ └── pipeline.yml
   │
   └── README.md`
+```
 
 ## Fonctionnement global
 
