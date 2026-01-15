@@ -1,0 +1,122 @@
+---
+- name: TP WebSolutions — Configuration & vérifications via Ansible (Docker local)
+  hosts: local
+  gather_facts: false
+
+  vars:
+      nginx_container: "ws_nginx"
+      api_url: "http://host.docker.internal:8080"
+      nginx_conf_src: "files/nginx/hardened.conf"
+      nginx_conf_dest: "/etc/nginx/conf.d/default.conf"
+
+  tasks:
+      - name: Vérifier que Docker répond
+        ansible.builtin.command: docker info
+        changed_when: false
+
+      - name: Vérifier que les conteneurs attendus existent
+        ansible.builtin.command: docker ps --format "{{'{{'}}.Names{{'}}'}}"
+        register: running
+        changed_when: false
+
+      - name: S'assurer que ws_nginx est démarré
+        ansible.builtin.assert:
+            that:
+                - nginx_container in running.stdout_lines
+            fail_msg: "Le conteneur {{ nginx_container }} n'est pas démarré. Lance OpenTofu (tofu apply) d'abord."
+
+      # 1) On récupère la conf actuelle dans le conteneur
+      - name: Lire la conf actuellement en place (si présente)
+        community.docker.docker_container_exec:
+            container: "{{ nginx_container }}"
+            command: ["sh", "-lc", "cat {{ nginx_conf_dest }} 2>/dev/null || true"]
+        register: current_conf
+        changed_when: false
+
+      # 2) On lit la conf locale
+      - name: Lire la conf locale
+        ansible.builtin.slurp:
+            src: "{{ nginx_conf_src }}"
+        register: local_conf
+        changed_when: false
+
+      - name: Déterminer si la conf doit être mise à jour
+        ansible.builtin.set_fact:
+            conf_needs_update: "{{ (current_conf.stdout | default('')) != (local_conf.content | b64decode) }}"
+        changed_when: false
+
+      # 3) On copie seulement si nécessaire (idempotence réelle)
+      - name: Copier la config Nginx durcie dans le conteneur (si différente)
+        community.docker.docker_container_copy_into:
+            container: "{{ nginx_container }}"
+            path: "{{ nginx_conf_src }}"
+            container_path: "/tmp/default.conf"
+        when: conf_needs_update
+
+      - name: Déployer la conf dans le bon dossier (si différente)
+        community.docker.docker_container_exec:
+            container: "{{ nginx_container }}"
+            command: ["sh", "-lc", "cp /tmp/default.conf {{ nginx_conf_dest }}"]
+        when: conf_needs_update
+
+      - name: Tester la syntaxe Nginx
+        community.docker.docker_container_exec:
+            container: "{{ nginx_container }}"
+            command: ["nginx", "-t"]
+        changed_when: false
+
+      - name: Recharger Nginx seulement si conf modifiée
+        community.docker.docker_container_exec:
+            container: "{{ nginx_container }}"
+            command: ["nginx", "-s", "reload"]
+        when: conf_needs_update
+        changed_when: conf_needs_update
+
+      - name: Attendre que l'API soit accessible via Nginx
+        ansible.builtin.uri:
+            url: "{{ api_url }}/"
+            method: GET
+            status_code: 200
+        register: wait_api
+        retries: 15
+        delay: 2
+        until: wait_api.status == 200
+        changed_when: false
+
+      - name: Vérifier que l'API répond derrière Nginx (endpoint /)
+        ansible.builtin.uri:
+            url: "{{ api_url }}/"
+            method: GET
+            return_content: true
+            status_code: 200
+        register: api_root
+        changed_when: false
+
+      - name: Vérifier que l'API parle à PostgreSQL (endpoint /health)
+        ansible.builtin.uri:
+            url: "{{ api_url }}/health"
+            method: GET
+            return_content: true
+            status_code: 200
+        register: api_health
+        changed_when: false
+
+      # Option 1: headers via uri (sans curl)
+      - name: Vérifier que les headers sécurité sont présents (via uri)
+        ansible.builtin.assert:
+            that:
+                - api_root.x_content_type_options is defined
+                - api_root.x_content_type_options == "nosniff"
+                - api_root.x_frame_options is defined
+                - api_root.x_frame_options == "DENY"
+                - api_root.referrer_policy is defined
+                - api_root.referrer_policy == "no-referrer"
+            fail_msg: "Headers sécurité manquants ou incorrects. Vérifie la conf Nginx copiée."
+
+      - name: Afficher un résumé
+        ansible.builtin.debug:
+            msg:
+                - "Conf Nginx modifiée: {{ conf_needs_update }}"
+                - "API OK: {{ api_root.status }}"
+                - "DB OK (/health): {{ api_health.status }}"
+                - "Headers: X-Content-Type-Options={{ api_root.x_content_type_options | default('N/A') }}, X-Frame-Options={{ api_root.x_frame_options | default('N/A') }}, Referrer-Policy={{ api_root.referrer_policy | default('N/A') }}"
